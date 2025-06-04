@@ -11,11 +11,12 @@ class ListProdukController extends Controller
     {
         $data = Produk::get();
         foreach ($data as $produk) {
+            $id[] = $produk->id;
             $nama[] = $produk->nama;
             $desc[] = $produk->deskripsi;
             $harga[] = $produk->harga;
         }
-        return view('list_produk', compact('nama', 'desc', 'harga'));
+        return view('list_produk', compact('id', 'nama', 'desc', 'harga'));
     }
 
     public function simpan(Request $request)
@@ -27,5 +28,27 @@ class ListProdukController extends Controller
         $produk->save();
 
         return redirect()->back()->with('success', 'Data berhasil disimpan!');
+    }
+
+    public function delete($id){
+        $produk = Produk::where('id', $id)->first();
+        if ($produk) {
+            $produk->delete();
+            return redirect()->back()->with('success', 'Produk berhasil dihapus');
+        }else{
+            return redirect()->back()->with('error', 'Produk tidak ditemukan');
+        }
+    }
+
+    public function update(Request $request, $id){
+        $produk = Produk::find($id);
+        if ($produk) {
+            $produk->nama = $request->input('nama');
+            $produk->deskripsi = $request->input('deskripsi');
+            $produk->harga = $request->input('harga');
+            $produk->save();
+            return redirect()->back()->with('success', 'Produk berhasil diperbarui!');
+        }
+        return redirect()->back()->with('error', 'Produk tidak ditemukan');
     }
 }
